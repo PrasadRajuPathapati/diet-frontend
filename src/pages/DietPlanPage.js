@@ -8,7 +8,7 @@ export default function DietPlanPage({ user, onLogout }) {
   const [dietPlanText, setDietPlanText] = useState(""); // raw text from backend
   const [todayMeals, setTodayMeals] = useState([]); // parsed meals for today
 
-  const API_BASE = "http://localhost:5000/api";
+  const API_BASE = "https://diet-backend-nnb5.onrender.com/api";
 
   // ✅ Helper: extract meals only for today's day
   const parsePlanForToday = (planText) => {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-const API_BASE_URL = 'http://localhost:5000/api'; // Ensure this is defined here or imported
+const API_BASE_URL = 'https://diet-backend-nnb5.onrender.com/api'; // Ensure this is defined here or imported
 
 function LoginPage({ onLogin }) {
   const [email, setEmail] = useState('');

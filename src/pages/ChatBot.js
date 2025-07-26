@@ -6,7 +6,7 @@ export default function ChatBot({ user }) {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const API_BASE = "http://localhost:5000/api";
+  const API_BASE = "https://diet-backend-nnb5.onrender.com/api";
 
   // ✅ Load previous chats on mount
   useEffect(() => {

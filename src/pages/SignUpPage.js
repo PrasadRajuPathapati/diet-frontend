@@ -1,7 +1,7 @@
 import React, { useState } from 'react'; // Fix: Remove ' =>'
 import { Link, useNavigate } from 'react-router-dom';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'https://diet-backend-nnb5.onrender.com/api';
 
 function SignUpPage({ onSignUp }) {
   const [email, setEmail] = useState('');

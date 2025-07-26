@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL = "https://diet-backend-nnb5.onrender.com/api";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
