@@ -1,23 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../index.css";
 
 export default function DietPlanPage({ user, onLogout }) {
   const navigate = useNavigate();
   const [doneMeals, setDoneMeals] = useState([]);
-  const [dietPlanText, setDietPlanText] = useState(""); // raw text from backend
-  const [todayMeals, setTodayMeals] = useState([]); // parsed meals for today
+  const [dietPlanText, setDietPlanText] = useState("");
+  const [todayMeals, setTodayMeals] = useState([]);
 
   const API_BASE = "https://diet-backend-nnb5.onrender.com/api";
 
-  // ✅ Helper: extract meals only for today's day
   const parsePlanForToday = (planText) => {
     if (!planText) return [];
-
     const dayName = new Date().toLocaleDateString("en-US", { weekday: "long" });
 
-    // Split text by lines
-    const lines = planText.split("\n").map((l) => l.trim()).filter(Boolean);
+    const lines = planText
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean);
 
     let capture = false;
     let meals = [];
@@ -26,54 +25,46 @@ export default function DietPlanPage({ user, onLogout }) {
     lines.forEach((line) => {
       const lowerLine = line.toLowerCase();
 
-      // Start capturing when we find today
       if (lowerLine.includes(dayName.toLowerCase())) {
         capture = true;
-        return; // skip the heading line itself
+        return;
       }
 
-      // Stop capturing when another day appears
       if (
         capture &&
-        (lowerLine.includes("monday") ||
-          lowerLine.includes("tuesday") ||
-          lowerLine.includes("wednesday") ||
-          lowerLine.includes("thursday") ||
-          lowerLine.includes("friday") ||
-          lowerLine.includes("saturday") ||
-          lowerLine.includes("sunday")) &&
-        !lowerLine.includes(dayName.toLowerCase())
+        ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"].some(
+          (d) => lowerLine.includes(d) && !lowerLine.includes(dayName.toLowerCase())
+        )
       ) {
         capture = false;
       }
 
       if (!capture) return;
 
-      // Skip lines that are just the day headings accidentally captured
       if (
-        ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"].some((d) =>
+        ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"].some((d) =>
           lowerLine.startsWith(d)
         )
       ) {
         return;
       }
 
-      // Detect a meal heading: starts with "*" or ends with ":"
       if (line.startsWith("*") || line.endsWith(":")) {
         if (currentMeal) meals.push(currentMeal);
+
         const cleanName = line.replace(/^\*+/, "").replace(/\*+$/, "").trim();
-        // Skip if name is exactly the day (just in case)
         const lowerName = cleanName.toLowerCase();
-        if (
-          ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"].includes(lowerName)
-        ) {
-          return;
+
+        const allowed = ["breakfast", "lunch", "snack", "dinner"];
+        const isAllowed = allowed.some((m) => lowerName.startsWith(m));
+
+        if (isAllowed) {
+          currentMeal = { name: cleanName, items: [] };
+        } else {
+          currentMeal = null;
         }
-        currentMeal = { name: cleanName, items: [] };
-      } else if (line.startsWith("+") || line.startsWith("-")) {
-        if (currentMeal) {
-          currentMeal.items.push(line.replace(/^[\+\-]/, "").trim());
-        }
+      } else if ((line.startsWith("+") || line.startsWith("-")) && currentMeal) {
+        currentMeal.items.push(line.replace(/^[\+\-]/, "").trim());
       }
     });
 
@@ -113,47 +104,72 @@ export default function DietPlanPage({ user, onLogout }) {
   };
 
   return (
-    <div className="diet-plan-page">
-      <header className="header">
-        <h1>🥗 Your Diet Plan</h1>
-        <div className="header-buttons">
-          <button onClick={() => navigate("/dashboard")}>🏠 Dashboard</button>
-          <button onClick={onLogout}>📒 Logout</button>
+    <div className="min-h-screen bg-green-50 text-gray-800 p-6">
+      <header className="flex justify-between items-center bg-green-100 p-4 rounded-lg shadow-md mb-6">
+        <h1 className="text-2xl font-bold text-green-700">🥗 Your Diet Plan</h1>
+        <div className="space-x-4">
+          <button
+            className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded transition"
+            onClick={() => navigate("/dashboard")}
+          >
+            🏠 Dashboard
+          </button>
+          <button
+            className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded transition"
+            onClick={onLogout}
+          >
+            📒 Logout
+          </button>
         </div>
       </header>
 
-      <div className="meals-grid">
+      <section className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
         {todayMeals.length > 0 ? (
           todayMeals.map((meal, idx) => (
-            <div className="meal-card" key={idx}>
-              <h3>{meal.name}</h3>
-              <ul>
-                {meal.items.map((item, i) => (
-                  <li key={i}>{item}</li>
-                ))}
-              </ul>
-              <button
-                className={`done-btn ${doneMeals.includes(idx) ? "done" : ""}`}
-                onClick={() => handleDone(idx)}
-                disabled={doneMeals.includes(idx)}
-              >
-                {doneMeals.includes(idx) ? "✅ Done" : "Mark as Done"}
-              </button>
+            <div
+              key={idx}
+              className={`bg-white rounded-xl shadow hover:shadow-lg transform transition-all duration-300 border-l-4 ${
+                doneMeals.includes(idx)
+                  ? "border-green-600 opacity-70"
+                  : "border-green-300"
+              }`}
+            >
+              <div className="p-5">
+                <h3 className="text-xl font-semibold text-green-700 mb-2">{meal.name}</h3>
+                <ul className="list-disc list-inside text-sm text-gray-700 mb-4">
+                  {meal.items.map((item, i) => (
+                    <li key={i}>{item}</li>
+                  ))}
+                </ul>
+                <button
+                  onClick={() => handleDone(idx)}
+                  disabled={doneMeals.includes(idx)}
+                  className={`w-full px-4 py-2 rounded font-medium ${
+                    doneMeals.includes(idx)
+                      ? "bg-green-200 text-green-800 cursor-not-allowed"
+                      : "bg-green-500 hover:bg-green-600 text-white"
+                  } transition`}
+                >
+                  {doneMeals.includes(idx) ? "✅ Done" : "Mark as Done"}
+                </button>
+              </div>
             </div>
           ))
         ) : (
-          <p>No diet plan found for today.</p>
+          <p className="col-span-full text-center text-gray-600">No diet plan found for today.</p>
         )}
-      </div>
+      </section>
 
-      <div className="detailed-plan-container">
-        <h2>Your Full Diet Plan (Raw)</h2>
+      <section className="bg-white p-6 rounded-lg shadow-lg">
+        <h2 className="text-xl font-bold text-green-700 mb-4">📋 Full Diet Plan (Raw)</h2>
         {dietPlanText ? (
-          <pre className="bot-plan">{dietPlanText}</pre>
+          <pre className="bg-gray-100 p-4 rounded text-sm overflow-auto whitespace-pre-wrap max-h-96">
+            {dietPlanText}
+          </pre>
         ) : (
-          <p>No diet plan saved yet.</p>
+          <p className="text-gray-600">No diet plan saved yet.</p>
         )}
-      </div>
+      </section>
     </div>
   );
 }

@@ -22,279 +22,213 @@ ChartJS.register(
   Legend
 );
 
-function WeightTrackerPage({ user, onLogout }) { // Receive 'user' prop
+function WeightTrackerPage({ user, onLogout }) {
   const navigate = useNavigate();
 
   const [currentWeight, setCurrentWeight] = useState('');
   const [weightLogMessage, setWeightLogMessage] = useState('');
   const [isLoggingWeight, setIsLoggingWeight] = useState(false);
   const [loggedWeights, setLoggedWeights] = useState(() => {
-    const savedWeights = localStorage.getItem('loggedWeights');
-    return savedWeights ? JSON.parse(savedWeights) : [];
+    const saved = localStorage.getItem('loggedWeights');
+    return saved ? JSON.parse(saved) : [];
   });
 
   const [currentDateTimeDisplay, setCurrentDateTimeDisplay] = useState('');
 
-  // Effect to save loggedWeights to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('loggedWeights', JSON.stringify(loggedWeights));
 
-    // Date/time update logic for navbar
-    const updateDateTime = () => {
+    const updateTime = () => {
       const now = new Date();
       const options = {
-        weekday: 'short',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
+        weekday: 'short', year: 'numeric', month: '2-digit',
+        day: '2-digit', hour: '2-digit', minute: '2-digit',
         hour12: true,
       };
       setCurrentDateTimeDisplay(now.toLocaleString('en-IN', options));
     };
 
-    updateDateTime();
-    const intervalId = setInterval(updateDateTime, 1000 * 60);
-
-    return () => clearInterval(intervalId);
+    updateTime();
+    const timer = setInterval(updateTime, 60000);
+    return () => clearInterval(timer);
   }, [loggedWeights]);
-
 
   const handleWeightLog = async (e) => {
     e.preventDefault();
-    setWeightLogMessage('');
     setIsLoggingWeight(true);
+    setWeightLogMessage('');
 
-    const weightValue = parseFloat(currentWeight);
-
-    if (currentWeight === '' || isNaN(weightValue) || weightValue <= 0) {
-      setWeightLogMessage({ type: 'error', text: 'Please enter a valid positive weight.' });
+    const weight = parseFloat(currentWeight);
+    if (!weight || weight <= 0) {
+      setWeightLogMessage({ type: 'error', text: 'Please enter a valid weight.' });
       setIsLoggingWeight(false);
       return;
     }
 
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    console.log(`Logging weight: ${weightValue} kg`);
+    await new Promise(res => setTimeout(res, 1500));
 
     const now = new Date();
-    const formattedDate = now.toLocaleDateString('en-IN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    });
-    const formattedTime = now.toLocaleTimeString('en-IN', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: true
-    });
-
-    const newLogEntry = {
+    const entry = {
       id: Date.now(),
-      weight: weightValue,
-      date: formattedDate,
-      time: formattedTime,
+      weight,
+      date: now.toLocaleDateString('en-IN'),
+      time: now.toLocaleTimeString('en-IN'),
       timestamp: now.getTime()
     };
 
-    setLoggedWeights(prevWeights =>
-      [newLogEntry, ...prevWeights].sort((a, b) => a.timestamp - b.timestamp)
-    );
-
-    setWeightLogMessage({ type: 'success', text: `Weight ${weightValue} kg logged successfully!` });
+    setLoggedWeights(prev => [entry, ...prev].sort((a, b) => a.timestamp - b.timestamp));
+    setWeightLogMessage({ type: 'success', text: `Logged ${weight} kg successfully!` });
     setCurrentWeight('');
     setIsLoggingWeight(false);
   };
 
-  if (!user) { // Check 'user' prop
+  if (!user) {
     navigate('/login');
     return null;
   }
 
-  const sortedLoggedWeights = [...loggedWeights].sort((a, b) => a.timestamp - b.timestamp);
-
-  const chartLabels = sortedLoggedWeights.map(log => log.date);
-  const chartDataPoints = sortedLoggedWeights.map(log => log.weight);
-
+  const sorted = [...loggedWeights].sort((a, b) => a.timestamp - b.timestamp);
   const chartData = {
-    labels: chartLabels,
-    datasets: [
-      {
-        label: 'Weight (kg)',
-        data: chartDataPoints,
-        fill: false,
-        borderColor: '#28a745',
-        backgroundColor: '#28a745',
-        tension: 0.2,
-        pointRadius: 5,
-        pointBackgroundColor: '#1e8449',
-        pointBorderColor: '#fff',
-        pointHoverRadius: 7,
-        pointHoverBackgroundColor: '#1e8449',
-        pointHoverBorderColor: '#fff',
-      },
-    ],
+    labels: sorted.map(l => l.date),
+    datasets: [{
+      label: 'Weight (kg)',
+      data: sorted.map(l => l.weight),
+      borderColor: '#4ade80',
+      backgroundColor: '#4ade80',
+      tension: 0.2,
+      pointRadius: 4,
+    }]
   };
 
   const chartOptions = {
     responsive: true,
-    maintainAspectRatio: false,
     plugins: {
-      legend: {
-        display: false,
-        position: 'top',
-      },
+      legend: { display: false },
       title: {
         display: true,
-        text: 'Your Weight Progress Over Time',
-        font: {
-          size: 18,
-          weight: 'bold'
-        },
-        color: '#333'
+        text: 'Weight Progress Over Time',
+        color: '#16a34a',
+        font: { size: 18, weight: 'bold' },
       },
-      tooltip: {
-        callbacks: {
-          label: function(context) {
-            let label = context.dataset.label || '';
-            if (label) {
-              label += ': ';
-            }
-            if (context.parsed.y !== null) {
-              label += context.parsed.y + ' kg';
-            }
-            return label;
-          },
-          title: function(context) {
-              return 'Date: ' + context[0].label;
-          }
-        }
-      }
     },
     scales: {
       x: {
         title: {
           display: true,
           text: 'Date',
-          font: {
-              size: 14
-          },
-          color: '#555'
-        },
-        grid: {
-          display: false,
-        },
+          color: '#555',
+          font: { size: 14 }
+        }
       },
       y: {
         title: {
           display: true,
           text: 'Weight (kg)',
-          font: {
-              size: 14
-          },
-          color: '#555'
-        },
-        beginAtZero: false,
-        grid: {
-          color: '#f0f0f0',
+          color: '#555',
+          font: { size: 14 }
         },
         ticks: {
-          callback: function(value) {
-            return value + ' kg';
-          }
+          callback: value => `${value} kg`
         }
-      },
-    },
+      }
+    }
   };
 
   return (
-    <div className="home-page-container">
-      <nav className="home-navbar">
-        <h1 className="navbar-title">
-          Daily Weight Tracker
-          {currentDateTimeDisplay && <span className="navbar-datetime">{currentDateTimeDisplay}</span>}
-        </h1>
+    <div className="min-h-screen bg-green-50 p-4">
+      {/* Navbar */}
+      <nav className="flex justify-between items-center bg-green-100 p-4 rounded shadow-md mb-6">
         <div>
-          <button onClick={() => navigate('/home')} className="back-button">Back to Dashboard</button>
-          <button onClick={() => { onLogout(); navigate('/login'); }} className="logout-button">Logout</button>
+          <h1 className="text-xl font-bold text-green-800">Weight Tracker</h1>
+          {currentDateTimeDisplay && (
+            <p className="text-sm text-green-600">{currentDateTimeDisplay}</p>
+          )}
+        </div>
+        <div className="space-x-2">
+          <button
+            onClick={() => navigate('/home')}
+            className="bg-green-200 hover:bg-green-300 text-green-900 px-3 py-1 rounded"
+          >
+            Dashboard
+          </button>
+          <button
+            onClick={() => { onLogout(); navigate('/login'); }}
+            className="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1 rounded"
+          >
+            Logout
+          </button>
         </div>
       </nav>
 
-      <div className="home-content-card">
-        <h2 className="page-section-title">Log Your Weight</h2>
-        <p className="page-section-description">Keep a consistent record of your weight to track your progress towards your goal of **65 kg** from **77 kg**.</p>
-
-        <form onSubmit={handleWeightLog} className="weight-log-form">
+      {/* Form */}
+      <div className="max-w-2xl mx-auto bg-white p-6 rounded shadow-md">
+        <h2 className="text-lg font-semibold text-green-800 mb-2">Log Your Weight</h2>
+        <form onSubmit={handleWeightLog} className="flex flex-col gap-4">
           <input
             type="number"
             step="0.1"
-            className="form-input weight-input"
-            placeholder="Enter weight in kg (e.g., 72.5)"
             value={currentWeight}
             onChange={(e) => setCurrentWeight(e.target.value)}
-            required
-            aria-label="Enter current weight"
+            placeholder="Enter weight in kg"
+            className="border border-gray-300 px-3 py-2 rounded outline-green-500"
           />
           <button
             type="submit"
-            className={`primary-button log-weight-button ${isLoggingWeight ? 'loading-button' : ''}`}
+            className={`bg-green-500 hover:bg-green-600 text-white py-2 rounded flex justify-center items-center gap-2 ${isLoggingWeight ? 'opacity-70 cursor-wait' : ''}`}
             disabled={isLoggingWeight}
           >
-            {isLoggingWeight ? (
-              <>
-                <div className="spinner"></div> Logging...
-              </>
-            ) : 'Log Weight'}
+            {isLoggingWeight && (
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            )}
+            {isLoggingWeight ? 'Logging...' : 'Log Weight'}
           </button>
         </form>
         {weightLogMessage.text && (
-          <p className={`weight-log-message ${weightLogMessage.type}`}>
+          <p className={`mt-2 text-sm ${weightLogMessage.type === 'error' ? 'text-red-600' : 'text-green-600'}`}>
             {weightLogMessage.text}
           </p>
         )}
+      </div>
 
-        {/* Weight History Table */}
-        <div className="weight-history-section">
-            <h3 className="sub-section-title">Weight History</h3>
-            {loggedWeights.length > 0 ? (
-                <div className="table-container">
-                    <table className="weight-history-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Time</th>
-                                <th>Weight (kg)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {loggedWeights.slice().reverse().map(log => (
-                                <tr key={log.id}>
-                                    <td>{log.date}</td>
-                                    <td>{log.time}</td>
-                                    <td>{log.weight.toFixed(1)}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            ) : (
-                <p className="no-data-message">No weight data logged yet. Log your first weight!</p>
-            )}
-        </div>
+      {/* History Table */}
+      <div className="max-w-4xl mx-auto mt-8 bg-white p-6 rounded shadow-md">
+        <h3 className="text-lg font-semibold text-green-800 mb-4">Weight History</h3>
+        {loggedWeights.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left border border-green-200">
+              <thead className="bg-green-100 text-green-800">
+                <tr>
+                  <th className="px-4 py-2 border">Date</th>
+                  <th className="px-4 py-2 border">Time</th>
+                  <th className="px-4 py-2 border">Weight (kg)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loggedWeights.slice().reverse().map(log => (
+                  <tr key={log.id} className="even:bg-green-50">
+                    <td className="px-4 py-2 border">{log.date}</td>
+                    <td className="px-4 py-2 border">{log.time}</td>
+                    <td className="px-4 py-2 border">{log.weight.toFixed(1)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="text-gray-600">No data logged yet.</p>
+        )}
+      </div>
 
-
-        {/* Weight Progress Chart (Replaced Placeholder) */}
-        <div className="progress-graph-container">
-          <h3 className="sub-section-title">Your Weight Progress Graph</h3>
-          {loggedWeights.length >= 2 ? (
-              <div className="chart-area">
-                  <Line data={chartData} options={chartOptions} />
-              </div>
-          ) : (
-              <p className="no-data-message">Log at least two weights to see your progress graph!</p>
-          )}
-        </div>
+      {/* Chart */}
+      <div className="max-w-4xl mx-auto mt-8 bg-white p-6 rounded shadow-md">
+        <h3 className="text-lg font-semibold text-green-800 mb-4">Progress Chart</h3>
+        {loggedWeights.length >= 2 ? (
+          <div className="w-full h-64">
+            <Line data={chartData} options={chartOptions} />
+          </div>
+        ) : (
+          <p className="text-gray-600">Log at least two weights to see progress.</p>
+        )}
       </div>
     </div>
   );

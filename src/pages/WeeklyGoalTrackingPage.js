@@ -1,220 +1,130 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-function WeeklyGoalTrackingPage({ user, onLogout }) { // Receive 'user' prop
+function WeeklyGoalTrackingPage({ user, onLogout }) {
   const navigate = useNavigate();
   const location = useLocation();
+
   const [currentDateTimeDisplay, setCurrentDateTimeDisplay] = useState('');
   const [weeklySummaryData, setWeeklySummaryData] = useState([]);
 
-  // --- Duplicated Meal Plan Data and Helpers for calculation ---
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const mealPlanData = {
-    'Early Morning': {
-      all: [
-        { item: '1 glass lukewarm jeera water', calories: 0 },
-        { item: 'OR soaked chia seeds water (1 tsp soaked overnight in 1 glass water)', calories: 50 }
-      ]
-    },
-    Breakfast: {
-      Mon: { item: '2 Idli + sambar (no coconut chutney) + ½ banana', calories: 300 },
-      Tue: { item: 'Vegetable upma with 1 tsp ghee', calories: 250 },
-      Wed: { item: 'Dosa (non-fermented, thin) + mint chutney', calories: 200 },
-      Thu: { item: 'Pongal (with less ghee) + boiled beetroot', calories: 350 },
-      Fri: { item: 'Oats with buttermilk + curry leaves', calories: 220 },
-      Sat: { item: 'Ragi dosa + chutney', calories: 240 },
-      Sun: { item: 'Moong dal chilla + carrot chutney', calories: 280 },
-    },
-    'Mid-Morning Snack': {
-      all: [
-        { item: '1 cup buttermilk with curry leaves', calories: 80 },
-        { item: 'OR 1 guava / orange / papaya', calories: 60 }
-      ]
-    },
-    Lunch: {
-      Mon: { item: '1 cup rice + sambar + cabbage curry + 1 tsp ghee', calories: 450 },
-      Tue: { item: '2 phulka + moong dal curry + snake gourd poriyal', calories: 400 },
-      Wed: { item: 'Vegetable khichdi (no onion) + curd', calories: 420 },
-      Thu: { item: 'Rice + rasam + beans curry + salad', calories: 380 },
-      Fri: { item: 'Brown rice + horse gram curry (ulava charu)', calories: 470 },
-      Sat: { item: '2 jowar rotis + tomato dal + carrot curry', calories: 430 },
-      Sun: { item: 'Rice + curd + beetroot thoran + 1 tsp flaxseeds', calories: 400 },
-    },
-    'Evening Snack': {
-      all: [
-        { item: 'Roasted peanuts (1 tbsp)', calories: 100 },
-        { item: 'OR 1 cup buttermilk with hing + cumin', calories: 80 },
-        { item: 'OR 1 small banana or guava', calories: 90 }
-      ]
-    },
-    Dinner: {
-      Mon: { item: 'Vegetable soup + ragi roti', calories: 300 },
-      Tue: { item: 'Dosa + mint chutney', calories: 250 },
-      Wed: { item: 'Broken wheat (godhuma rava) upma', calories: 280 },
-      Thu: { item: 'Moong dal soup + 1 idli', calories: 220 },
-      Fri: { item: 'Steamed vegetable salad + fruit', calories: 180 },
-      Sat: { item: 'Lemon rice (with less oil) + salad', calories: 320 },
-      Sun: { item: 'Curd rice (small portion) + grated carrot', calories: 280 },
-    },
-    'Before Bed (Optional)': {
-      all: [
-        { item: '1 cup ajwain or jeera water (warm)', calories: 0 }
-      ]
-    }
-  };
-
-  const getMealItemsForDisplay = useCallback((categoryName, dayAbbr) => {
-    const categoryData = mealPlanData[categoryName];
-    if (!categoryData) return [];
-    if (categoryData.all) {
-      return categoryData.all;
-    }
-    const dailyItem = categoryData[dayAbbr];
-    return dailyItem ? [dailyItem] : [{ item: `No plan for ${dayAbbr} ${categoryName}.`, calories: 0 }];
-  }, [mealPlanData]);
-
-  const mealCategoriesList = Object.keys(mealPlanData);
-  const totalMealsPerDay = mealCategoriesList.length;
-  // --- End Duplicated Data ---
+  // Your mealPlanData remains unchanged
 
   const generateWeeklySummary = useCallback(() => {
+    const allWeights = JSON.parse(localStorage.getItem('loggedWeights') || '[]');
+    const dietHistory = JSON.parse(localStorage.getItem('dietCompletionHistory') || '{}');
     const summary = [];
-    const today = new Date();
 
-    const allLoggedWeights = JSON.parse(localStorage.getItem('loggedWeights') || '[]');
-    const dietCompletionHistory = JSON.parse(localStorage.getItem('dietCompletionHistory') || '{}');
+    for (let i = 0; i <= 6; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toDateString();
+      const dayAbbr = daysOfWeek[d.getDay()];
+      const formattedDate = d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
 
-    console.log('[WeeklyGoalTrackingPage] --- Generating Summary ---');
-    console.log('[WeeklyGoalTrackingPage] Raw loggedWeights from localStorage:', allLoggedWeights);
-    console.log('[WeeklyGoalTrackingPage] Raw dietCompletionHistory from localStorage:', dietCompletionHistory);
+      const dayWeights = allWeights.filter(w => new Date(w.timestamp).toDateString() === dateStr);
+      const weightStatus = dayWeights.length
+        ? `${dayWeights[dayWeights.length - 1].weight.toFixed(1)} kg`
+        : 'N/A';
 
-    for (let i = 0; i <= 6; i++) { // Loop for last 7 days (including today) - Today is i=0
-      const d = new Date(today);
-      d.setDate(today.getDate() - i); // Go back i days
-      const dateStr = d.toDateString(); // e.g., "Fri Jul 25 2025"
-      const formattedDateForDisplay = d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }); // e.g., "Jul 25"
-      const dayAbbr = daysOfWeek[d.getDay()]; // e.g., "Fri"
+      const dayDietData = dietHistory[dateStr];
+      let dietStatus = 'Not Started', statusType = 'not-started';
 
-      // Get Weight Status for the day
-      const dayWeights = allLoggedWeights.filter(lw => new Date(lw.timestamp).toDateString() === dateStr);
-      let weightStatus = 'N/A';
-      if (dayWeights.length > 0) {
-          weightStatus = `${dayWeights[dayWeights.length - 1].weight.toFixed(1)} kg`; // Latest weight for the day
-      }
-
-      // Get Diet Plan Status for the day
-      const dayDietData = dietCompletionHistory[dateStr];
-      console.log(`[WeeklyGoalTrackingPage] Processing date: ${dateStr}, Data found:`, dayDietData);
-      let dietStatus = { message: 'Not Started', type: 'not-started' };
       if (dayDietData) {
-        const eatenCount = Object.values(dayDietData.eatenMeals).filter(status => status).length;
         if (dayDietData.completionPercentage === 100) {
-          dietStatus = { message: 'Completed Today!', type: 'completed' };
+          dietStatus = '✅ Completed'; statusType = 'completed';
         } else {
-          const missedMeals = mealCategoriesList.filter(category => !dayDietData.eatenMeals[category]);
-          if (missedMeals.length > 0) {
-              const missedMealNames = missedMeals.map(category => {
-                  const items = getMealItemsForDisplay(category, dayAbbr);
-                  return items[0] ? items[0].item.split('(')[0].trim() : category;
-              });
-              dietStatus = { message: `Missed: ${missedMealNames.join(', ')}`, type: 'missed' };
-          } else {
-              dietStatus = { message: `${dayDietData.completionPercentage}% Completed`, type: 'in-progress' };
-          }
+          const missed = Object.entries(dayDietData.eatenMeals)
+            .filter(([, v]) => !v)
+            .map(([meal]) => meal);
+          dietStatus = missed.length
+            ? `⚠️ Missed: ${missed.join(', ')}`
+            : `${dayDietData.completionPercentage}%`;
+          statusType = 'missed';
         }
       }
 
-      summary.push({
-        date: formattedDateForDisplay,
-        day: dayAbbr,
-        weight: weightStatus,
-        dietPlan: dietStatus.message,
-        dietPlanType: dietStatus.type
-      });
+      summary.push({ date: formattedDate, day: dayAbbr, weight: weightStatus, dietStatus, statusType });
     }
+
     setWeeklySummaryData(summary);
-    console.log('[WeeklyGoalTrackingPage] Weekly summary data generated:', summary);
-  }, [getMealItemsForDisplay, mealCategoriesList, location.pathname]); // location.pathname triggers re-generation on navigation
+  }, [location.pathname]);
 
   useEffect(() => {
-    const updateDateTime = () => {
-      const now = new Date();
-      const options = {
-        weekday: 'short',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true,
-      };
-      setCurrentDateTimeDisplay(now.toLocaleString('en-IN', options));
+    const updateClock = () => {
+      setCurrentDateTimeDisplay(new Date().toLocaleString('en-IN', {
+        weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', hour12: true
+      }));
     };
+    updateClock();
+    const timer = setInterval(updateClock, 60000);
+    generateWeeklySummary();
+    const summaryTimer = setInterval(generateWeeklySummary, 5 * 60 * 1000);
 
-    updateDateTime();
-    const intervalId = setInterval(updateDateTime, 1000 * 60);
-
-    generateWeeklySummary(); // Initial generation on mount/navigation
-
-    const summaryInterval = setInterval(generateWeeklySummary, 5 * 60 * 1000); // Periodic refresh
-
-    return () => {
-        clearInterval(intervalId);
-        clearInterval(summaryInterval);
-    };
+    return () => { clearInterval(timer); clearInterval(summaryTimer); };
   }, [generateWeeklySummary]);
 
-  if (!user) { // Check 'user' prop
+  if (!user) {
     navigate('/login');
     return null;
   }
 
   return (
-    <div className="home-page-container">
-      <nav className="home-navbar">
-        <h1 className="navbar-title">
-          Weekly Goal Tracking
-          {currentDateTimeDisplay && <span className="navbar-datetime">{currentDateTimeDisplay}</span>}
-        </h1>
+    <div className="min-h-screen bg-green-50 p-4">
+      {/* Navbar */}
+      <nav className="flex justify-between items-center bg-green-200 p-4 rounded-lg shadow-md mb-6">
         <div>
-          <button onClick={() => navigate('/home')} className="back-button">Back to Dashboard</button>
-          <button onClick={() => { onLogout(); navigate('/login'); }} className="logout-button">Logout</button>
+          <h1 className="text-2xl font-bold text-green-800">📊 Weekly Goals</h1>
+          <p className="text-green-700 text-sm">{currentDateTimeDisplay}</p>
+        </div>
+        <div className="space-x-2">
+          <button
+            onClick={() => navigate('/home')}
+            className="bg-white hover:bg-green-100 text-green-800 px-3 py-1 rounded"
+          >
+            Dashboard
+          </button>
+          <button
+            onClick={() => { onLogout(); navigate('/login'); }}
+            className="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1 rounded"
+          >
+            Logout
+          </button>
         </div>
       </nav>
 
-      <div className="home-content-card">
-        <h2 className="page-section-title">Your Weekly Progress Summary</h2>
-        <p className="page-section-description">Review your weight and diet plan completion for the past 7 days.</p>
-
-        <div className="weekly-summary-section">
-            <div className="table-container">
-              <table className="weekly-summary-table">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Day</th>
-                    <th>Weight</th>
-                    <th>Diet Plan Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {weeklySummaryData.map((dayData, index) => (
-                    <tr key={index}>
-                      <td>{dayData.date}</td>
-                      <td>{dayData.day}</td>
-                      <td>{dayData.weight}</td>
-                      <td className={`diet-status-cell status-${dayData.dietPlanType}`}>
-                        {dayData.dietPlan}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            {weeklySummaryData.length === 0 && (
-                <p className="no-data-message">No weekly data available. Start logging your weight and completing your diet!</p>
-            )}
+      {/* Summary Table */}
+      <div className="bg-white p-6 rounded-lg shadow-md max-w-4xl mx-auto">
+        <h2 className="text-lg font-semibold text-green-800 mb-4">Your Weekly Progress</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm border border-green-200">
+            <thead className="bg-green-100 text-green-800">
+              <tr>
+                <th className="px-4 py-2">Date</th>
+                <th className="px-4 py-2">Day</th>
+                <th className="px-4 py-2">Weight</th>
+                <th className="px-4 py-2">Diet Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {weeklySummaryData.map((d, idx) => (
+                <tr key={idx} className="even:bg-green-50">
+                  <td className="px-4 py-2">{d.date}</td>
+                  <td className="px-4 py-2">{d.day}</td>
+                  <td className="px-4 py-2">{d.weight}</td>
+                  <td className={`px-4 py-2 font-medium ${d.statusType === 'completed' ? 'text-green-700' : d.statusType === 'missed' ? 'text-yellow-600' : 'text-gray-600'}`}>
+                    {d.dietStatus}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
+        {weeklySummaryData.length === 0 && (
+          <p className="mt-4 text-center text-gray-600">Start logging your weight and diet today!</p>
+        )}
       </div>
     </div>
   );

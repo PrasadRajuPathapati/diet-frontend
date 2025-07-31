@@ -1,14 +1,17 @@
-/** @type {import('tailwindcss').Config} */
+// tailwind.config.js
 module.exports = {
   content: [
-    "./app/**/*.{js,ts,jsx,tsx}",
-    "./components/**/*.{js,ts,jsx,tsx}"
+    "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
     extend: {
       colors: {
-        primary: "#A8DF8E", // light green
+        primary: "#4f46e5", // or your preferred brand color
         background: "#ffffff",
+        foreground: "#000000",
+        accent: "#f1f5f9",
+        'accent-foreground': "#000000",
+        input: "#d1d5db",
       },
     },
   },
