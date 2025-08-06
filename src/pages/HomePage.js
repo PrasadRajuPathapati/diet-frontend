@@ -151,18 +151,25 @@ function HomePage({ user, onLogout }) {
           <p className="text-xs md:text-sm text-gray-600">{currentDateTimeDisplay}</p>
         </div>
         <div className="flex items-center space-x-2 md:space-x-4">
-          <Link to="/profile-setup"
-            className="px-3 py-1 md:px-4 md:py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition-all duration-300 transform hover:scale-105 active:scale-95 flex items-center justify-center">
-            Profile
-          </Link>
-          <button
-            onClick={() => {
-              onLogout();
-            }}
-            className="px-3 py-1 md:px-4 md:py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm transition-all duration-300 transform hover:scale-105 active:scale-95"
-          >
-            Logout
-          </button>
+<Link
+  to="/profile-setup"
+  className="px-3 py-1 md:px-4 md:py-2 bg-teal-500/40 backdrop-blur-md border border-white/30 
+             text-black rounded-lg text-sm font-medium transition-all duration-300 transform 
+             hover:scale-105 hover:shadow-lg hover:shadow-teal-200 active:scale-95 flex 
+             items-center justify-center">
+  Profile
+</Link>
+<button
+  onClick={() => {
+    onLogout();
+  }}
+  className="px-3 py-1 md:px-4 md:py-2 bg-rose-500/40 backdrop-blur-md border border-white/30 
+             text-black rounded-lg text-sm font-medium transition-all duration-300 transform 
+             hover:scale-105 hover:shadow-lg hover:shadow-rose-200 active:scale-95">
+  Logout
+</button>
+
+
         </div>
       </nav>
 
@@ -187,65 +194,86 @@ function HomePage({ user, onLogout }) {
         {/* Feature Cards */}
         <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6 transition-opacity duration-500 ${showCards ? 'opacity-100' : 'opacity-0'}`}>
 
-          {/* Diet Plan */}
-          <Link
-            to="/diet-plan"
-            className="bg-white/30 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-green-200 animate-fade-in-card animation-delay-600"
-            onMouseEnter={() => !isMobile && setDietImg(dietGif)}
-            onMouseLeave={() => !isMobile && setDietImg(dietStatic)}
-          >
-            <img src={dietImg} alt="Diet Plan" className="w-14 h-14 mx-auto mb-3 object-contain" />
-            <h3 className="text-lg md:text-xl font-semibold text-green-600">Your Diet Plan</h3>
-            <p className="text-sm text-gray-700 mt-2">Personalized meals to support your journey.</p>
-          </Link>
+        {/* Diet Plan */}
+<Link
+  to="/diet-plan"
+  className="bg-white/30 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg p-6 text-center 
+             transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-green-200 
+             animate-fade-in-card animation-delay-600 group"
+  onMouseEnter={() => !isMobile && setDietImg(dietGif)}
+  onMouseLeave={() => !isMobile && setDietImg(dietStatic)}
+>
+  <img src={dietImg} alt="Diet Plan" className="w-14 h-14 mx-auto mb-3 object-contain" />
+  <h3 className="text-lg md:text-xl font-semibold text-green-600 group-hover:text-green-600">
+    Your Diet Plan
+  </h3>
+  <p className="text-sm text-gray-700 mt-2">Personalized meals to support your journey.</p>
+</Link>
 
-          {/* Weight Tracker */}
-          <Link
-            to="/weight-tracker"
-            className="bg-white/30 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-blue-200 animate-fade-in-card animation-delay-700"
-            onMouseEnter={() => !isMobile && setWeightImg(weightAnimated)}
-            onMouseLeave={() => !isMobile && setWeightImg(weightStatic)}
-          >
-            <img src={weightImg} alt="Weight Tracker" className="w-14 h-14 mx-auto mb-3 object-contain" />
-            <h3 className="text-lg md:text-xl font-semibold text-blue-600">Daily Weight Tracker</h3>
-            <p className="text-sm text-gray-700 mt-2">Track your weight with progress charts.</p>
-          </Link>
+{/* Weight Tracker */}
+<Link
+  to="/weight-tracker"
+  className="bg-white/30 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg p-6 text-center 
+             transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-green-200 
+             animate-fade-in-card animation-delay-700 group"
+  onMouseEnter={() => !isMobile && setWeightImg(weightAnimated)}
+  onMouseLeave={() => !isMobile && setWeightImg(weightStatic)}
+>
+  <img src={weightImg} alt="Weight Tracker" className="w-14 h-14 mx-auto mb-3 object-contain" />
+  <h3 className="text-lg md:text-xl font-semibold text-blue-600 group-hover:text-green-600">
+    Daily Weight Tracker
+  </h3>
+  <p className="text-sm text-gray-700 mt-2">Track your weight with progress charts.</p>
+</Link>
 
-          {/* Exercise Plan */}
-          <Link
-            to="/exercise-plan"
-            className="bg-white/30 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-purple-200 animate-fade-in-card animation-delay-800"
-            onMouseEnter={() => !isMobile && setExerciseImg(exerciseGif)}
-            onMouseLeave={() => !isMobile && setExerciseImg(exerciseStatic)}
-          >
-            <img src={exerciseImg} alt="Exercise Plan" className="w-14 h-14 mx-auto mb-3 object-contain" />
-            <h3 className="text-lg md:text-xl font-semibold text-purple-600">Exercise Plan</h3>
-            <p className="text-sm text-gray-700 mt-2">Daily belly-fat workouts to stay active.</p>
-          </Link>
+{/* Exercise Plan */}
+<Link
+  to="/exercise-plan"
+  className="bg-white/30 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg p-6 text-center 
+             transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-green-200 
+             animate-fade-in-card animation-delay-800 group"
+  onMouseEnter={() => !isMobile && setExerciseImg(exerciseGif)}
+  onMouseLeave={() => !isMobile && setExerciseImg(exerciseStatic)}
+>
+  <img src={exerciseImg} alt="Exercise Plan" className="w-14 h-14 mx-auto mb-3 object-contain" />
+  <h3 className="text-lg md:text-xl font-semibold text-purple-600 group-hover:text-green-600">
+    Exercise Plan
+  </h3>
+  <p className="text-sm text-gray-700 mt-2">Daily belly-fat workouts to stay active.</p>
+</Link>
 
-          {/* Diet Plan Assistant */}
-          <Link
-            to="/diet-planner"
-            className="bg-white/30 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-yellow-200 animate-fade-in-card animation-delay-900"
-            onMouseEnter={() => !isMobile && setAiDietImg(aiDietGif)}
-            onMouseLeave={() => !isMobile && setAiDietImg(aiDietStatic)}
-          >
-            <img src={aiDietImg} alt="Diet Plan Assistant" className="w-14 h-14 mx-auto mb-3 object-contain" />
-            <h3 className="text-lg md:text-xl font-semibold text-yellow-600">Diet Plan Assistant</h3>
-            <p className="text-sm text-gray-700 mt-2">Let AI suggest your meals for the day.</p>
-          </Link>
+{/* Diet Plan Assistant */}
+<Link
+  to="/diet-planner"
+  className="bg-white/30 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg p-6 text-center 
+             transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-green-200 
+             animate-fade-in-card animation-delay-900 group"
+  onMouseEnter={() => !isMobile && setAiDietImg(aiDietGif)}
+  onMouseLeave={() => !isMobile && setAiDietImg(aiDietStatic)}
+>
+  <img src={aiDietImg} alt="Diet Plan Assistant" className="w-14 h-14 mx-auto mb-3 object-contain" />
+  <h3 className="text-lg md:text-xl font-semibold text-yellow-600 group-hover:text-green-600">
+    Diet Plan Assistant
+  </h3>
+  <p className="text-sm text-gray-700 mt-2">Let AI suggest your meals for the day.</p>
+</Link>
 
-          {/* Weekly Goals */}
-          <Link
-            to="/weekly-goals"
-            className="bg-white/30 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-indigo-200 animate-fade-in-card animation-delay-1000"
-            onMouseEnter={() => !isMobile && setWeeklyImg(weeklyGif)}
-            onMouseLeave={() => !isMobile && setWeeklyImg(weeklyStatic)}
-          >
-            <img src={weeklyImg} alt="Weekly Goals" className="w-14 h-14 mx-auto mb-3 object-contain" />
-            <h3 className="text-lg md:text-xl font-semibold text-indigo-600">Weekly Goals</h3>
-            <p className="text-sm text-gray-700 mt-2">Track your weekly achievements.</p>
-          </Link>
+{/* Weekly Goals */}
+<Link
+  to="/weekly-goals"
+  className="bg-white/30 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg p-6 text-center 
+             transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-green-200 
+             animate-fade-in-card animation-delay-1000 group"
+  onMouseEnter={() => !isMobile && setWeeklyImg(weeklyGif)}
+  onMouseLeave={() => !isMobile && setWeeklyImg(weeklyStatic)}
+>
+  <img src={weeklyImg} alt="Weekly Goals" className="w-14 h-14 mx-auto mb-3 object-contain" />
+  <h3 className="text-lg md:text-xl font-semibold text-indigo-600 group-hover:text-green-600">
+    Weekly Goals
+  </h3>
+  <p className="text-sm text-gray-700 mt-2">Track your weekly achievements.</p>
+</Link>
+
 
         </div>
       </div>
