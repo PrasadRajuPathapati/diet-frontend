@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
-
+import Todo3DPage from './pages/Todo3DPage';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
 import HomePage from './pages/HomePage';
@@ -142,6 +142,7 @@ function App() {
   };
 
   return (
+    
     <div className="App">
       <Routes>
         {/* NEW: Intelligent Root Redirect */}
@@ -167,6 +168,7 @@ function App() {
         <Route path="/profile-setup" element={<ProtectedRoute><ProfileSetupPage user={user} onLogin={handleLogin} /></ProtectedRoute>} />
 
         {/* Protected Main App Routes */}
+        <Route path="/todo-3d" element={<Todo3DPage user={user} />} />
         <Route path="/home" element={<ProtectedRoute><HomePage user={user} onLogout={handleLogout} /></ProtectedRoute>} />
         <Route path="/weight-tracker" element={<ProtectedRoute><WeightTrackerPage user={user} onLogout={handleLogout} /></ProtectedRoute>} />
         <Route path="/diet-plan" element={<ProtectedRoute><DietPlanPage user={user} onLogout={handleLogout} /></ProtectedRoute>} />

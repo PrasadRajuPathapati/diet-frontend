@@ -484,3 +484,38 @@ html, body {
     .chart-center-text .label { font-size: 0.7rem; }
     .chart-summary { font-size: 0.75rem; }
 }
+@keyframes bg-animation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.bg-size-200 {
+  background-size: 200% 200%;
+  animation: bg-animation 15s ease infinite;
+}
+@keyframes dropFood {
+  0% {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(12px);
+    opacity: 1;
+  }
+}
+
+@layer utilities {
+  .animate-dropFood {
+    animation: dropFood 0.6s ease forwards;
+  }
+  .delay-100 {
+    animation-delay: 0.1s;
+  }
+  .delay-200 {
+    animation-delay: 0.2s;
+  }
+}
