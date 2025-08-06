@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'; // useRef already here
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
 // Diet Plan images
@@ -25,7 +25,6 @@ function HomePage({ user, onLogout }) {
   const navigate = useNavigate();
   const contentRef = useRef(null);
 
-  // Images state
   const [dietImg, setDietImg] = useState(dietStatic);
   const [weightImg, setWeightImg] = useState(weightStatic);
   const [exerciseImg, setExerciseImg] = useState(exerciseStatic);
@@ -33,13 +32,11 @@ function HomePage({ user, onLogout }) {
   const [weeklyImg, setWeeklyImg] = useState(weeklyStatic);
 
   const [isMobile, setIsMobile] = useState(false);
-
   const [currentDateTimeDisplay, setCurrentDateTimeDisplay] = useState('');
   const [latestWeight, setLatestWeight] = useState('N/A');
   const [dietPlanStatusMessage, setDietPlanStatusMessage] = useState('Loading...');
   const [showCards, setShowCards] = useState(false);
 
-  // Meal Plan data
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const mealPlanData = { /* your full mealPlanData object unchanged */ };
 
@@ -54,13 +51,11 @@ function HomePage({ user, onLogout }) {
   const totalMealsPerDay = mealCategoriesList.length;
 
   useEffect(() => {
-    // Detect mobile/touch
     const mobileCheck =
       window.matchMedia("(max-width: 768px)").matches || "ontouchstart" in window;
     setIsMobile(mobileCheck);
 
     if (mobileCheck) {
-      // Show GIFs immediately on mobile
       setDietImg(dietGif);
       setWeightImg(weightAnimated);
       setExerciseImg(exerciseGif);
@@ -143,9 +138,14 @@ function HomePage({ user, onLogout }) {
   const userName = user.name || user.email || 'User';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-100 via-white to-green-200 flex flex-col items-center p-4 animate-bg-gradient">
+    <div className="min-h-screen flex flex-col p-0 animate-bg-gradient"
+      style={{
+        background: "linear-gradient(135deg, rgba(167, 243, 208, 0.7), rgba(255, 255, 255, 0.6), rgba(187, 247, 208, 0.7))",
+        backgroundAttachment: "fixed"
+      }}
+    >
       {/* Header */}
-      <nav className="w-full max-w-6xl flex justify-between items-center bg-white/70 backdrop-blur-md shadow-lg rounded-xl px-4 md:px-6 py-3 mb-4 md:mb-6 border border-white/30 animate-fade-in-down">
+      <nav className="w-full flex justify-between items-center bg-white/40 backdrop-blur-lg shadow-lg px-4 md:px-6 py-3 mb-4 md:mb-6 border-b border-white/30 animate-fade-in-down">
         <div>
           <h1 className="text-xl md:text-2xl font-bold text-green-600">My Weight Loss Plan</h1>
           <p className="text-xs md:text-sm text-gray-600">{currentDateTimeDisplay}</p>
@@ -167,9 +167,16 @@ function HomePage({ user, onLogout }) {
       </nav>
 
       {/* Content */}
-      <div ref={contentRef} className="w-full max-w-6xl bg-white/70 backdrop-blur-md rounded-2xl p-6 md:p-8 shadow-xl border border-white/30 flex-grow-0 overflow-y-auto custom-scrollbar">
-        <h2 className="text-2xl md:text-3xl font-bold text-green-600 mb-2 md:mb-4 text-center animate-fade-in">Welcome, {userName}! 🌱</h2>
-        <p className="text-sm md:text-base text-gray-700 mb-4 text-center animate-fade-in animation-delay-200">Let’s keep crushing your goals today!</p>
+      <div
+        ref={contentRef}
+        className="w-full bg-white/40 backdrop-blur-lg rounded-none p-6 md:p-8 shadow-xl border-t border-white/30 flex-1 flex flex-col justify-start overflow-y-auto"
+      >
+        <h2 className="text-2xl md:text-3xl font-bold text-green-600 mb-2 md:mb-4 text-center animate-fade-in">
+          Welcome, {userName}! 🌱
+        </h2>
+        <p className="text-sm md:text-base text-gray-700 mb-4 text-center animate-fade-in animation-delay-200">
+          Let’s keep crushing your goals today!
+        </p>
 
         <div className="mb-4 text-xs md:text-sm text-gray-800 text-center animate-fade-in animation-delay-400">
           <p><strong>Latest Weight:</strong> {latestWeight}</p>
@@ -177,18 +184,17 @@ function HomePage({ user, onLogout }) {
           <p>Other Goals: *Coming soon!*</p>
         </div>
 
-        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mt-6 transition-opacity duration-500 ${showCards ? 'opacity-100' : 'opacity-0'}`}>
+        {/* Feature Cards */}
+        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6 transition-opacity duration-500 ${showCards ? 'opacity-100' : 'opacity-0'}`}>
 
           {/* Diet Plan */}
           <Link
             to="/diet-plan"
-            className="feature-card feature-card-diet-plan animate-fade-in-card animation-delay-600 group relative overflow-hidden"
+            className="bg-white/30 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-green-200 animate-fade-in-card animation-delay-600"
             onMouseEnter={() => !isMobile && setDietImg(dietGif)}
             onMouseLeave={() => !isMobile && setDietImg(dietStatic)}
           >
-            <div className="relative flex justify-center items-center mb-2">
-              <img src={dietImg} alt="Diet Plan" className="w-12 h-12 mb-2 object-contain" />
-            </div>
+            <img src={dietImg} alt="Diet Plan" className="w-14 h-14 mx-auto mb-3 object-contain" />
             <h3 className="text-lg md:text-xl font-semibold text-green-600">Your Diet Plan</h3>
             <p className="text-sm text-gray-700 mt-2">Personalized meals to support your journey.</p>
           </Link>
@@ -196,23 +202,23 @@ function HomePage({ user, onLogout }) {
           {/* Weight Tracker */}
           <Link
             to="/weight-tracker"
-            className="feature-card animate-fade-in-card animation-delay-700 flex flex-col items-center"
+            className="bg-white/30 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-blue-200 animate-fade-in-card animation-delay-700"
             onMouseEnter={() => !isMobile && setWeightImg(weightAnimated)}
             onMouseLeave={() => !isMobile && setWeightImg(weightStatic)}
           >
-            <img src={weightImg} alt="Weight Tracker" className="w-12 h-12 mb-2 object-contain" />
+            <img src={weightImg} alt="Weight Tracker" className="w-14 h-14 mx-auto mb-3 object-contain" />
             <h3 className="text-lg md:text-xl font-semibold text-blue-600">Daily Weight Tracker</h3>
-            <p className="text-sm text-gray-700 mt-2 text-center">Track your weight with progress charts.</p>
+            <p className="text-sm text-gray-700 mt-2">Track your weight with progress charts.</p>
           </Link>
 
           {/* Exercise Plan */}
           <Link
             to="/exercise-plan"
-            className="feature-card animate-fade-in-card animation-delay-800 flex flex-col items-center"
+            className="bg-white/30 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-purple-200 animate-fade-in-card animation-delay-800"
             onMouseEnter={() => !isMobile && setExerciseImg(exerciseGif)}
             onMouseLeave={() => !isMobile && setExerciseImg(exerciseStatic)}
           >
-            <img src={exerciseImg} alt="Exercise Plan" className="w-12 h-12 mb-2 object-contain" />
+            <img src={exerciseImg} alt="Exercise Plan" className="w-14 h-14 mx-auto mb-3 object-contain" />
             <h3 className="text-lg md:text-xl font-semibold text-purple-600">Exercise Plan</h3>
             <p className="text-sm text-gray-700 mt-2">Daily belly-fat workouts to stay active.</p>
           </Link>
@@ -220,11 +226,11 @@ function HomePage({ user, onLogout }) {
           {/* Diet Plan Assistant */}
           <Link
             to="/diet-planner"
-            className="feature-card animate-fade-in-card animation-delay-900 flex flex-col items-center"
+            className="bg-white/30 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-yellow-200 animate-fade-in-card animation-delay-900"
             onMouseEnter={() => !isMobile && setAiDietImg(aiDietGif)}
             onMouseLeave={() => !isMobile && setAiDietImg(aiDietStatic)}
           >
-            <img src={aiDietImg} alt="Diet Plan Assistant" className="w-12 h-12 mb-2 object-contain" />
+            <img src={aiDietImg} alt="Diet Plan Assistant" className="w-14 h-14 mx-auto mb-3 object-contain" />
             <h3 className="text-lg md:text-xl font-semibold text-yellow-600">Diet Plan Assistant</h3>
             <p className="text-sm text-gray-700 mt-2">Let AI suggest your meals for the day.</p>
           </Link>
@@ -232,11 +238,11 @@ function HomePage({ user, onLogout }) {
           {/* Weekly Goals */}
           <Link
             to="/weekly-goals"
-            className="feature-card animate-fade-in-card animation-delay-1000 flex flex-col items-center"
+            className="bg-white/30 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-indigo-200 animate-fade-in-card animation-delay-1000"
             onMouseEnter={() => !isMobile && setWeeklyImg(weeklyGif)}
             onMouseLeave={() => !isMobile && setWeeklyImg(weeklyStatic)}
           >
-            <img src={weeklyImg} alt="Weekly Goals" className="w-12 h-12 mb-2 object-contain" />
+            <img src={weeklyImg} alt="Weekly Goals" className="w-14 h-14 mx-auto mb-3 object-contain" />
             <h3 className="text-lg md:text-xl font-semibold text-indigo-600">Weekly Goals</h3>
             <p className="text-sm text-gray-700 mt-2">Track your weekly achievements.</p>
           </Link>
