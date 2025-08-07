@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
-
+import { Dumbbell } from 'lucide-react';
 // Diet Plan images
 import dietStatic from "../assets/salad.png";
 import dietGif from "../assets/salad.gif";
@@ -20,6 +20,8 @@ import aiDietGif from "../assets/turing-test.gif";
 // Weekly Goals images
 import weeklyStatic from "../assets/calendar-time.png";
 import weeklyGif from "../assets/calendar-time.gif";
+
+import balance from "../assets/student (2).gif";
 
 function HomePage({ user, onLogout }) {
   const navigate = useNavigate();
@@ -154,10 +156,19 @@ function HomePage({ user, onLogout }) {
         ref={contentRef}
         className="w-full bg-white/40 backdrop-blur-lg rounded-none p-6 md:p-8 shadow-xl border-t border-white/30 flex-1 flex flex-col justify-start overflow-y-auto"
       >
-        <h2 className="text-2xl md:text-3xl font-bold text-green-600 mb-2 md:mb-4 text-center relative">
-          Welcome, {userName}! 🌱
-          <span className="absolute left-1/2 -bottom-1 w-16 h-[3px] bg-green-300 rounded-full transform -translate-x-1/2"></span>
-        </h2>
+<h2 className="text-2xl md:text-3xl font-bold text-green-600 mb-6 text-center relative">
+  <div className="flex items-center justify-center gap-1">
+      <img
+      src={balance}
+      alt="Weekly Goals"
+      className="w-14 h-12 object-contain"  // 👈 increase size here
+    />
+    <span>Welcome, {userName}!</span>
+  </div>
+  <span className="absolute left-1/2 -bottom-2 w-16 h-[3px] bg-green-300 rounded-full transform -translate-x-1/2"></span>
+</h2>
+
+
 
         {/* Quote with emoji + highlight + fade */}
         <div
@@ -288,7 +299,12 @@ function HomePage({ user, onLogout }) {
           </Link>
         </div>
       </div>
+      <footer className="text-center text-gray-500 text-sm py-3">
+  © 2025 All rights reserved
+</footer>
+
     </div>
+    
   );
 }
 
